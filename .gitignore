@@ -1,0 +1,7 @@
+.
+.DS_Store
+._*
+.vscode
+out
+__pycache__
+*.sage.py
