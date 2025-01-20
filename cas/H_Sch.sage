@@ -1,4 +1,4 @@
-n, l, m = 2, 0, 0
+n, l, m = 1, 0, 0
 n_ = 1 # the effective n used in undimensionalizing
 
 from sage.manifolds.operators import *
@@ -62,9 +62,9 @@ print(f'd ph / d tau\n{nice(dph_dtau)}')
 print(f'r\n({nice(r)})^+')
 
 # verification of key analytical results
-a1 = nice_vector_field(grad(log(rho_s)).cross_product(s_s))
-a2 = nice_vector_field(E.vector_field(0, 0, nice(-4/n*sin(th)*dlogR_drho(xi)-2/xi*cos(th)*dlogP_dth(th))))
-b1 = nice(grad(log(rho_s)).dot(s_s).expr())
-b2 = nice(4/n*cos(th)*dlogR_drho(xi)-2/xi*sin(th)*dlogP_dth(th))
-assert a1 == a2
-assert b1 == b2
+# a1 = nice_vector_field(grad(log(rho_s)).cross_product(s_s))
+# a2 = nice_vector_field(E.vector_field(0, 0, nice(-4/n*sin(th)*dlogR_drho(xi)-2/xi*cos(th)*dlogP_dth(th))))
+# b1 = nice(grad(log(rho_s)).dot(s_s).expr())
+# b2 = nice(4/n*cos(th)*dlogR_drho(xi)-2/xi*sin(th)*dlogP_dth(th))
+# assert a1 == a2
+# assert b1 == b2

@@ -5,24 +5,24 @@ from util import C_to_s
 
 # physics params
 # superposition of (n,l,j,m) eigenstates, can be unnormalized
-state = [(1, (2, 1, 1/2, +1/2))]
-state = [(1, (2, 1, 3/2, +1/2))]
-state = [(1, (2, 1, 1/2, +1/2)), (1j, (3, 0, 1/2, -1/2)), (-2, (4, 3, 5/2, -1/2))]
-alpha = 0.1 # fine structure constant
+# state = [(1, (2, 1, 1/2, +1/2)), (1j, (3, 0, 1/2, -1/2)), (-2, (4, 3, 5/2, -1/2))]
+state = [(1, (1, 0, 1/2, +1/2))]
+alpha = 0.3 # fine structure constant
 # plot params
 plot_3D = False # simple 3D plot instead of 2D plot
 quiver_2D = True
-hr = 30 # half range in Bohr radii
-N = 256 # resolution
+hr = 10 # half range in Bohr radii
+N = 512 # resolution
 N_quiver = 16 # quiver resolution
-plot_dark = True # plot 2D with dark background, 3D is always dark
-use_tex = False # use LaTeX text rendering
+plot_dark = False # plot 2D with dark background, 3D is always dark
+use_tex = True # use LaTeX text rendering
 sqrt_scaling = True # plot the square root of density instead
 plane_init = 'xz'; assert plane_init in ('xz', 'yz', 'xy') # default plane
 slice_init = 0 # default slice
 plot_save = False # save 2D plot instead of showing
+plot_title = False # plot the state in the title
 
-def psi(n, l, j, m, alpha, r, th, phi) -> tuple[float,float,float,float]:
+def psi(n, l, j, m, alpha, xi, th, phi) -> tuple[float,float,float,float]:
   p = j-l == 1/2
   pm = 2*p-1
   a = ((l+pm*m+1/2)/(2*l+1))**.5
@@ -35,18 +35,18 @@ def psi(n, l, j, m, alpha, r, th, phi) -> tuple[float,float,float,float]:
   Yc = sph_harm(m-1/2, l+pm, phi, th)*(-1)**(m-1/2) if c != 0 else 0
   Yd = sph_harm(m+1/2, l+pm, phi, th)*(-1)**(m+1/2) if d != 0 else 0
   jp = j+1/2
-  gamma = (jp**2-alpha**2)**.5
-  N = (n**2-2*(n-jp)*(jp-gamma))**.5
+  Jp = (jp**2-alpha**2)**.5
+  N = (n**2-2*(n-jp)*(jp-Jp))**.5
   eps = (1-(alpha/N)**2)**.5
   f = math.factorial
   G = math.gamma
-  R_norm = (G(2*gamma+n-jp+1)/(4*N*(N+pm*jp)*G(2*gamma+1)**2*f(round(n-jp)))*(2/N)**3)**.5
-  rho = 2*r/N
-  M0 = hyp1f1(-n+jp,2*gamma+1,rho) if N+pm*jp != 0 else 0
-  M1 = hyp1f1(-n+jp+1,2*gamma+1,rho) if jp-n != 0 else 0
-  R_phi = R_norm*(1+eps)**.5*rho**(gamma-1)*np.exp(-rho/2)*((jp-n)*M1+(N+pm*jp)*M0)
-  R_chi = 1j*R_norm*(1-eps)**.5*rho**(gamma-1)*np.exp(-rho/2)*((jp-n)*M1-(N+pm*jp)*M0)
-  return (a*R_phi*Ya, b*R_phi*Yb, c*R_chi*Yc*0, d*R_chi*Yd*0)
+  R_norm = (G(2*Jp-jp+n+1)/(4*N*(N+pm*jp)*G(2*Jp+1)**2*f(round(n-jp)))*(2/N)**3)**.5
+  rho = 2*xi/N
+  M0 = hyp1f1(-n+jp,2*Jp+1,rho)
+  M1 = hyp1f1(-n+jp+1,2*Jp+1,rho)
+  R_phi = R_norm*(1+eps)**.5*rho**(Jp-1)*np.exp(-rho/2)*((jp-n)*M1+(N+pm*jp)*M0)
+  R_chi = 1j*R_norm*(1-eps)**.5*rho**(Jp-1)*np.exp(-rho/2)*((jp-n)*M1-(N+pm*jp)*M0)
+  return (a*R_phi*Ya, b*R_phi*Yb, c*R_chi*Yc, d*R_chi*Yd)
 
 def s(psi, rho) -> tuple[float,float,float]:
   ss = N//N_quiver
@@ -96,9 +96,9 @@ def run_plot_2D():
     nonlocal vmax
     if vmax is None: vmax = np.max(data)
     ax.clear()
-    ax.set_xlabel(f'${plane[0]}$'); ax.set_ylabel(f'${plane[1]}$')
-    title = f'${(set('xyz')-set(plane)).pop()}={slice:.1f}$ $\\alpha={alpha:.2f}$'
-    if len(state) == 1:
+    ax.set_xlabel(f'${plane[0]}/a$'); ax.set_ylabel(f'${plane[1]}/a$')
+    title = f'${(set('xyz')-set(plane)).pop()}/a={slice:.1f}$ $\\alpha={alpha:.2f}$'
+    if len(state) == 1 and plot_title:
       _, (n, l, j, m) = state[0]
       title = f'$(n,l,j,m)=({n},{l},{j},{m})$\n{title}'
     ax.set_title(title)
@@ -136,7 +136,7 @@ def run_plot_2D():
     alpha_slider.on_changed(update)
     plane_radio.on_clicked(update)
   if plot_save:
-    plt.savefig(Path('out')/f'H_Dirac_sol.pdf', bbox_inches='tight')
+    plt.savefig(Path('out')/'H_Dirac_sol.pdf', bbox_inches='tight')
   else: plt.show()
 
 def run_plot_3D():

@@ -4,6 +4,7 @@
 #include "integrate.hpp"
 
 constexpr __uint128_t inc_seed = 2036-8-12;
+namespace S_G = Stern_Gerlach;
 
 extern "C"
 {
@@ -21,10 +22,10 @@ PyObject *Bohmian
   for (size_t i = 0; i < n; i++)
     paths[i] = new std::vector<double>;
   pcg_xsl_rr_128_64::State rng {seed, inc_seed};
-  Stern_Gerlach::gen_ic<Stern_Gerlach::Bohmian>(paths, rng, sig_);
+  S_G::gen_ic<S_G::Bohmian>(paths, rng, sig_);
 
   auto vel = [&](double t, std::array<double, 3> X)
-  { return Stern_Gerlach::vel<Stern_Gerlach::Bohmian>(t, X, sig_, px, b, ti, tf, c_);
+  { return S_G::vel<S_G::Bohmian>(t, X, sig_, px, b, ti, tf, c_);
   };
   auto stop = [&](double t, std::array<double, 3> X)
   { return t >= T;
@@ -58,10 +59,10 @@ PyObject *Pauli
   for (size_t i = 0; i < n; i++)
     paths[i] = new std::vector<double>;
   pcg_xsl_rr_128_64::State rng {seed, inc_seed};
-  Stern_Gerlach::gen_ic<Stern_Gerlach::Pauli>(paths, rng, sig_);
+  S_G::gen_ic<S_G::Pauli>(paths, rng, sig_);
 
   auto vel = [&](double t, std::array<double, 3> X)
-  { return Stern_Gerlach::vel<Stern_Gerlach::Pauli>(t, X, sig_, px, b, ti, tf, c_);
+  { return S_G::vel<S_G::Pauli>(t, X, sig_, px, b, ti, tf, c_);
   };
   auto stop = [&](double t, std::array<double, 3> X)
   { return t >= T;
@@ -95,13 +96,13 @@ PyObject *zigzag
   for (size_t i = 0; i < n; i++)
     paths[i] = new std::vector<double>;
   pcg_xsl_rr_128_64::State rng {seed, inc_seed};
-  Stern_Gerlach::gen_ic<Stern_Gerlach::zigzag>(paths, rng, sig_);
+  S_G::gen_ic<S_G::zigzag>(paths, rng, sig_);
 
   auto vel = [&](double t, std::array<double, 3> X, int chi)
-  { return Stern_Gerlach::vel<Stern_Gerlach::zigzag>(t, X, sig_, px, b, ti, tf, c_, chi);
+  { return S_G::vel<S_G::zigzag>(t, X, sig_, px, b, ti, tf, c_, chi);
   };
   auto rate = [&](double t, std::array<double, 3> X, int chi)
-  { return Stern_Gerlach::rate<Stern_Gerlach::zigzag>(t, X, sig_, px, b, ti, tf, c_, chi);
+  { return S_G::rate<S_G::zigzag>(t, X, sig_, px, b, ti, tf, c_, chi);
   };
   auto stop = [&](double t, std::array<double, 3> X, int chi)
   { return t >= T;

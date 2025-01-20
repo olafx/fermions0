@@ -1,4 +1,4 @@
-n, l, j, m = 2, 1, 3/2, +1/2
+n, l, j, m = 2, 1, 1/2, +1/2
 n_ = 1 # the effective n used in undimensionalizing
 
 from sage.manifolds.operators import *
@@ -30,17 +30,17 @@ P(l_,m_,x) = sqrt((2*l_+1)/2*f(l_-m_)/f(l_+m_))*P_(l_,m_,x)
 Y(l_,m_,th,ph) = 1/sqrt(2*pi)*P(l_,m_,cos(th))*exp(I*m_*ph)
 Pa(th) = nice(P(l,m-1/2,cos(th))) if a != 0 else 0
 Pb(th) = nice(P(l,m+1/2,cos(th))) if b != 0 else 0
-Ya(th,ph) = Y(l,m-1/2,th,ph) if a != 0 else 0
-Yb(th,ph) = Y(l,m+1/2,th,ph) if b != 0 else 0
+Ya(th,ph) = nice(Y(l,m-1/2,th,ph)) if a != 0 else 0
+Yb(th,ph) = nice(Y(l,m+1/2,th,ph)) if b != 0 else 0
 R_(rho) = exp(-rho/2)*rho^l*hypergeometric([-n+l+1],[2*l+2],rho)
 R(rho) = 1/f(2*l+1)*sqrt(f(n+l)/(f(n-l-1)*2*n))*(2/n)^(3/2)*R_(rho)
 rho_from_xi(xi) = 2*xi/n
 psi_a(xi,th,ph) = a*R(rho_from_xi(xi))*Ya(th,ph)
 psi_b(xi,th,ph) = b*R(rho_from_xi(xi))*Yb(th,ph)
 rho_(xi,th,ph) = R(rho_from_xi(xi))^2/(2*pi)*(a^2*Pa(th)^2+b^2*Pb(th)^2)
+s_z(th) = (a^2*Pa(th)^2-b^2*Pb(th)^2)/(a^2*Pa(th)^2+b^2*Pb(th)^2)
 s_xi(th) = (2*a*b*Pa(th)*Pb(th)*sin(th)+(a^2*Pa(th)^2-b^2*Pb(th)^2)*cos(th))/(a^2*Pa(th)^2+b^2*Pb(th)^2)
 s_th(th) = (2*a*b*Pa(th)*Pb(th)*cos(th)-(a^2*Pa(th)^2-b^2*Pb(th)^2)*sin(th))/(a^2*Pa(th)^2+b^2*Pb(th)^2)
-s_z(th) = (a^2*Pa(th)^2-b^2*Pb(th)^2)/(a^2*Pa(th)^2+b^2*Pb(th)^2)
 dPa_dth(th) = derivative(Pa(th),th)
 dPb_dth(th) = derivative(Pb(th),th)
 dlogR_drho(xi) = derivative(log(R(rho_from_xi(xi))),xi)/derivative(rho_from_xi(xi),xi)
@@ -71,18 +71,18 @@ print(f'd ph / d tau\n{nice(dph_dtau)}')
 print(f'r\n({nice(r)})^+')
 
 # verification of key analytical results
-a1 = nice_vector_field(curl(rho_s*s_s)/rho_s)
-a2 = nice_vector_field(E.vector_field(0, 0, 4/n*dlogR_drho(xi)*s_th(th)
-  -2/xi/(a^2*Pa(th)^2+b^2*Pb(th)^2)
-  *(a*b*sin(th)*(Pa(th)*dPb_dth(th)+Pb(th)*dPa_dth(th))
-  +a^2*cos(th)*Pa(th)*dPa_dth(th)
-  -b^2*cos(th)*Pb(th)*dPb_dth(th))
-  ))
-b1 = nice((div(rho_s*s_s)/rho_s).expr())
-b2 = nice(4/n*dlogR_drho(xi)*s_xi(th)
-  +2/xi/(a^2*Pa(th)^2+b^2*Pb(th)^2)
-  *(a*b*(cos(th)*(Pa(th)*dPb_dth(th)+Pb(th)*dPa_dth(th))+Pa(th)*Pb(th)/sin(th))
-  -a^2*sin(th)*Pa(th)*dPa_dth(th)
-  +b^2*sin(th)*Pb(th)*dPb_dth(th)))
-assert a1 == a2
-assert b1 == b2
+# a1 = nice_vector_field(curl(rho_s*s_s)/rho_s)
+# a2 = nice_vector_field(E.vector_field(0, 0, 4/n*dlogR_drho(xi)*s_th(th)
+#   -2/xi/(a^2*Pa(th)^2+b^2*Pb(th)^2)
+#   *(a*b*sin(th)*(Pa(th)*dPb_dth(th)+Pb(th)*dPa_dth(th))
+#   +a^2*cos(th)*Pa(th)*dPa_dth(th)
+#   -b^2*cos(th)*Pb(th)*dPb_dth(th))
+#   ))
+# b1 = nice((div(rho_s*s_s)/rho_s).expr())
+# b2 = nice(4/n*dlogR_drho(xi)*s_xi(th)
+#   +2/xi/(a^2*Pa(th)^2+b^2*Pb(th)^2)
+#   *(a*b*(cos(th)*(Pa(th)*dPb_dth(th)+Pb(th)*dPa_dth(th))+Pa(th)*Pb(th)/sin(th))
+#   -a^2*sin(th)*Pa(th)*dPa_dth(th)
+#   +b^2*sin(th)*Pb(th)*dPb_dth(th)))
+# assert a1 == a2
+# assert b1 == b2

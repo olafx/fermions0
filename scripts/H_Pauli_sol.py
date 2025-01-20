@@ -8,19 +8,20 @@ from util import C_to_s
 # state = [(1, (2, 1, 1/2, +1/2))]
 # state = [(1, (2, 1, 3/2, +1/2))]
 # state = [(1, (2, 1, 1/2, +1/2)), (1j, (3, 0, 1/2, -1/2)), (-2, (4, 3, 5/2, -1/2))]
-state = [(1, (2, 1, 1/2, +1/2))]
+state = [(1, (2, 1, 3/2, +1/2))]
 # plot params
 plot_3D = False # simple 3D plot instead of 2D plot
 quiver_2D = True
 hr = 20 # half range in Bohr radii
-N = 256 # resolution
-N_quiver = 16 # quiver resolution
-plot_dark = True # plot 2D with dark background, 3D is always dark
-use_tex = False # use LaTeX text rendering
+N = 512 # resolution
+N_quiver = 24 # quiver resolution
+plot_dark = False # plot 2D with dark background, 3D is always dark
+use_tex = True # use LaTeX text rendering
 sqrt_scaling = True # plot the square root of density instead
 plane_init = 'xz'; assert plane_init in ('xz', 'yz', 'xy') # default plane
 slice_init = 0 # default slice
-plot_save = False # save 2D plot instead of showing
+plot_save = True # save 2D plot instead of showing
+plot_title = False # plot the state in the title
 
 def psi(n, l, j, m, r, th, phi) -> tuple[float,float]:
   p = j-l == 1/2
@@ -84,7 +85,7 @@ def run_plot_2D():
     ax.clear()
     ax.set_xlabel(f'${plane[0]}$'); ax.set_ylabel(f'${plane[1]}$')
     title = f'${(set('xyz')-set(plane)).pop()}={slice:.1f}$'
-    if len(state) == 1:
+    if len(state) == 1 and plot_title:
       _, (n, l, j, m) = state[0]
       title = f'$(n,l,j,m)=({n},{l},{j},{m})$\n{title}'
     ax.set_title(title)

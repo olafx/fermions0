@@ -20,7 +20,7 @@ p_tol = 1e-3 # integrator transition probability tolerance
 max_iter = int(1e6) # integrator max number of iterations
 print_progress = True # integrator print progress
 # plot params
-plot_interactive_3D = False # simple 3D interactive plot instead of 2D plot
+plot_3D = False # simple 3D interactive plot instead of 2D plot
 plot_save = False # save 2D plots instead of showing
 plot_dark = True # plot 2D with dark background, 3D is always dark
 zoom_slits_yz = True # zoom in on the slits in the yz plot
@@ -48,7 +48,7 @@ match dynamics:
 
 import matplotlib.pyplot as plt
 colors = plt.cm.tab10.colors
-if plot_interactive_3D:
+if plot_3D:
   import vispy.app
   import vispy.scene
   canvas = vispy.scene.SceneCanvas(dynamics, keys='interactive', show=True)

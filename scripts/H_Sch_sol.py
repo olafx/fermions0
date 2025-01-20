@@ -5,19 +5,20 @@ from util import C_to_s
 
 # physics params
 # superposition of (n,l,m) eigenstates, can be unnormalized
-state = [(1, (2, 1, 0))]
-state = [(1, (2, 1, +1))]
+# state = [(1, (2, 1, -1)), (-1, (2, 1, +1))] # 2p_x
+# state = [(1, (2, 1, +1))]
 state = [(1/4, (1, 0, 0)), (3/4, (2, 1, 0))]
 # plot params
 plot_3D = False # simple 3D plot instead of 2D plot
-hr = 10 # half range in Bohr radii
-N = 256 # resolution
-plot_dark = True # plot 2D with dark background, 3D is always dark
-use_tex = False # use LaTeX text rendering
+hr = 15 # half range in Bohr radii
+N = 512 # resolution
+plot_dark = False # plot 2D with dark background, 3D is always dark
+use_tex = True # use LaTeX text rendering
 sqrt_scaling = True # plot the square root of density instead
 plane_init = 'xz'; assert plane_init in ('xz', 'yz', 'xy') # default plane
 slice_init = 0 # default slice
-plot_save = False # save 2D plot instead of showing
+plot_save = True # save 2D plot instead of showing
+plot_title = False # plot the state in the title
 
 def psi(n, l, m, r, th, phi) -> float:
   # remove Condon-Shortley phase
@@ -60,7 +61,7 @@ def run_plot_2D():
     ax.clear()
     ax.set_xlabel(f'${plane[0]}$'); ax.set_ylabel(f'${plane[1]}$')
     title = f'${(set('xyz')-set(plane)).pop()}={slice_:.1f}$'
-    if len(state) == 1:
+    if len(state) == 1 and plot_title:
       _, (n, l, m) = state[0]
       title = f'$(n,l,m)=({n},{l},{m})$\n{title}'
     ax.set_title(title)

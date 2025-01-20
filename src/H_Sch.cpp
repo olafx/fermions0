@@ -14,9 +14,9 @@ static PyObject *sample
 )
 { auto gil = PyGILState_Ensure();
   py_util::np_init();
-  std::array<double, 2> c_ {};
+  std::array<std::complex<double>, 2> c_ {};
   if constexpr (orbital == S_H::_100_210)
-    c_ = py_util::from_float_list<2>(c);
+    c_ = py_util::from_complex_list<2>(c);
   PyGILState_Release(gil);
   auto *samples = new std::vector<double>((chi_also ? 4 : 3)*n);
   auto n_threads = omp_get_max_threads();
@@ -93,9 +93,9 @@ static PyObject *trajectories
 )
 { auto gil = PyGILState_Ensure();
   py_util::np_init();
-  std::array<double, 2> c_ {};
+  std::array<std::complex<double>, 2> c_ {};
   if constexpr (orbital == S_H::_100_210)
-    c_ = py_util::from_float_list<2>(c);
+    c_ = py_util::from_complex_list<2>(c);
   auto [X0_dims, X0_data] = py_util::from_np_array<NPY_DOUBLE, double>(X0);
   PyGILState_Release(gil);
   double tauf = 0, time_scale = 0; // why are these set to 0? would be clearer if they weren't set
@@ -123,7 +123,7 @@ static PyObject *trajectories
     if constexpr (orbital == S_H::_100_210)
       return S_H::vel<orbital, dynamics>(tau, Xs, c_);
     if constexpr (orbital == S_H::_100_210_sigmoid)
-      return S_H::vel<orbital, dynamics>(tau, Xs, 4./3*om12/sig);
+      return S_H::vel<orbital, dynamics>(tau, Xs, om12/sig);
     if constexpr (orbital == S_H::_100_210_Rabi)
       return S_H::vel<orbital, dynamics>(tau, Xs, om12, Om, nu);
   };
@@ -158,9 +158,9 @@ static PyObject *trajectories
 )
 { auto gil = PyGILState_Ensure();
   py_util::np_init();
-  std::array<double, 2> c_ {};
+  std::array<std::complex<double>, 2> c_ {};
   if constexpr (orbital == S_H::_100_210)
-    c_ = py_util::from_float_list<2>(c);
+    c_ = py_util::from_complex_list<2>(c);
   auto [X0_dims, X0_data] = py_util::from_np_array<NPY_DOUBLE, double>(X0);
   PyGILState_Release(gil);
   double tauf = 0, timescale = 0;

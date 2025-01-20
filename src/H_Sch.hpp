@@ -10,14 +10,13 @@
 namespace Schrodinger_Hydrogen
 {
 
-using namespace std::numbers;
-
 enum Dynamics
 { Pauli, zigzag
 };
 enum Orbital
 { _100, _200, _210, _211, _2p_x, _100_210, _100_210_sigmoid, _100_210_Rabi
 };
+using namespace std::numbers;
 using namespace std::complex_literals;
 
 // undimensionalize (before integration)
@@ -90,23 +89,25 @@ void C_to_s
 
 template <Orbital orbital>
 double rho_0
-( std::array<double, 3> Xs, std::array<double, 2> c = {}
+( std::array<double, 3> Xs, std::array<std::complex<double>, 2> c = {}
 )
 { auto [xi, th, phi] = Xs;
   if constexpr (orbital == _100)
     return exp(-2*xi)*inv_pi;
   if constexpr (orbital == _200)
-    return exp(-xi)*pow(1-.5*xi,2)*inv_pi/8;
+    // return exp(-xi)*pow(1-.5*xi,2)*inv_pi/8;
+    return exp(-xi)*pow(xi-2,2)*inv_pi/32;
   if constexpr (orbital == _210)
     return exp(-xi)*pow(xi*cos(th),2)*inv_pi/32;
   if constexpr (orbital == _211)
     return exp(-xi)*pow(xi*sin(th),2)*inv_pi/64;
   if constexpr (orbital == _2p_x)
-    return exp(-xi)*pow(sin(th),2)*pow(cos(phi),2)*inv_pi/32;
+    // return exp(-xi)*pow(sin(th)*cos(phi),2)*inv_pi/32;
+    return exp(-xi)*pow(xi*sin(th)*cos(phi),2)*inv_pi/32;
   if constexpr (orbital == _100_210)
   { auto psi_100 = exp(-xi)*inv_sqrtpi;
     auto psi_210 = exp(-.5*xi)*xi*cos(th)/sqrt(32*pi);
-    return pow(c[0]*psi_100+c[1]*psi_210,2);
+    return std::norm(c[0]*psi_100+c[1]*psi_210);
   }
 }
 
@@ -186,7 +187,8 @@ std::array<double, 3> vel
 ( double tau, std::array<double, 3> Xs, double M = 0, double chi = 0
 )
 { auto [xi, th, phi] = Xs;
-  auto vel = std::array {0., 0., 1/xi*(1/(1-.5*xi)+1)};
+  // auto vel = std::array {0., 0., 1/xi*(1/(1-.5*xi)+1)};
+  auto vel = std::array {0., 0., 1/xi*(xi-4)/(xi-2)};
   if constexpr (dynamics == Pauli)
     return vel;
   vel[0] += M*chi*cos(th);
@@ -201,7 +203,8 @@ double rate
 ( double tau, std::array<double, 3> Xs, double M, double chi
 )
 { auto [xi, th, phi] = Xs;
-  return std::max(0., M*chi*(1/(1-.5*xi)+1)*cos(th));
+  // return std::max(0., M*chi*(1/(1-.5*xi)+1)*cos(th));
+  return std::max(0., M*chi*(xi-4)/(xi-2)*cos(th));
 }
 
 template <Orbital orbital, Dynamics dynamics>
@@ -210,7 +213,8 @@ std::array<double, 3> vel
 ( double tau, std::array<double, 3> Xs, double M = 0, double chi = 0
 )
 { auto [xi, th, phi] = Xs;
-  auto vel = std::array {0., 0., 1/xi*(1-1/xi)};
+  // auto vel = std::array {0., 0., 1/xi*(1-1/xi)};
+  auto vel = std::array {0., 0., 1/xi};
   if constexpr (dynamics == Pauli)
     return vel;
   vel[0] += M*chi*cos(th);
@@ -225,7 +229,8 @@ double rate
 ( double tau, std::array<double, 3> Xs, double M, double chi
 )
 { auto [xi, th, phi] = Xs;
-  return std::max(0., -M*chi*((2/xi-1)*cos(th)+sin(th)*tan(th)/xi));
+  // return std::max(0., -M*chi*((2/xi-1)*cos(th)+sin(th)*tan(th)/xi));
+  return std::max(0., M*chi*(xi*pow(cos(th),2)-2)/(xi*cos(th)));
 }
 
 template <Orbital orbital, Dynamics dynamics>
@@ -283,14 +288,14 @@ double rate
 template <Orbital orbital, Dynamics dynamics>
 requires (orbital == _100_210)
 std::array<double, 3> vel
-( double tau, std::array<double, 3> Xs, std::array<double, 2> c, double M = 0, double chi = 0
+( double tau, std::array<double, 3> Xs, std::array<std::complex<double>, 2> c, double M = 0, double chi = 0
 )
 { auto [xi, th, phi] = Xs;
   std::array c2
-  { pow(c[0],2),
-    pow(c[1],2)
+  { std::norm(c[0]),
+    std::norm(c[1])
   };
-  auto c_ = c[0]*c[1];
+  auto c_ = std::real(std::conj(c[0])*c[1]);
   auto A = c_/sqrt(32)*(1+.5*xi)*exp(-.5*xi)*cos(th)*sin(tau);
   auto B = -c_/sqrt(32)*exp(-.5*xi)*sin(th)*sin(tau);
   auto R = c2[0]*exp(-xi)
@@ -315,14 +320,14 @@ std::array<double, 3> vel
 template <Orbital orbital, Dynamics dynamics>
 requires (orbital == _100_210 && dynamics == zigzag)
 double rate
-( double tau, std::array<double, 3> Xs, std::array<double, 2> c, double M, double chi
+( double tau, std::array<double, 3> Xs, std::array<std::complex<double>, 2> c, double M, double chi
 )
 { auto [xi, th, phi] = Xs;
   std::array c2
-  { pow(c[0],2),
-    pow(c[1],2)
+  { std::norm(c[0]),
+    std::norm(c[1])
   };
-  auto c_ = c[0]*c[1];
+  auto c_ = std::real(std::conj(c[0])*c[1]);
   auto R = c2[0]*exp(-xi)
     +c2[1]/32*pow(xi,2)*pow(cos(th),2)
     +c_/sqrt(8)*xi*exp(-.5*xi)*cos(th)*cos(tau);
@@ -335,11 +340,11 @@ double rate
 template <Orbital orbital, Dynamics dynamics>
 requires (orbital == _100_210_sigmoid)
 std::array<double, 3> vel
-( double tau, std::array<double, 3> Xs, double om1_sig, double M = 0, double chi = 0
+( double tau, std::array<double, 3> Xs, double om12_sig, double M = 0, double chi = 0
 )
 { auto [xi, th, phi] = Xs;
   constexpr auto sigm_scale = 3.;
-  auto sigm_x = 2*sigm_scale/(pi*om1_sig)*tau-sigm_scale;
+  auto sigm_x = 2*sigm_scale/(pi*om12_sig)*tau-sigm_scale;
   std::array<double, 2> c;
   c[1] = 1./(1+exp(-sigm_x));
   c[0] = 1-c[1];

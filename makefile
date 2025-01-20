@@ -12,7 +12,7 @@ OMP_LIB_DIR = /opt/homebrew/Cellar/libomp/19.1.3/lib
 INCLUDE = -I$(PYTHON_INCLUDE_DIR) -I$(NUMPY_INCLUDE_DIR) -I$(OMP_INCLUDE_DIR)
 LIB = -L$(PYTHON_LIB_DIR) -L$(NUMPY_LIB_DIR) -L$(OMP_LIB_DIR)
 
-LIBS = Lorenz double_slit Stern_Gerlach H_Sch
+LIBS = Lorenz double_slit Stern_Gerlach H_Sch H_Pauli H_Dirac
 
 .PHONY: all clean $(LIBS)
 all: $(LIBS)
