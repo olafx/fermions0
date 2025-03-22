@@ -5,4 +5,4 @@ Code for [master thesis](https://kuleuven.limo.libis.be/discovery/fulldisplay?do
 - scripts: Python scripts, for running simulations and making plots
 - src: C++ code for simulations and sampling, requires linking to Python and NumPy C libraries, as well as OpenMP for parallelization, see makefile
 
-![zigzag](https://raw.githubusercontent.com/olafx/fermions0/refs/heads/main/out/Stern_Gerlach_zigzag_xz.png)
+![zigzag](https://raw.githubusercontent.com/olafx/fermions0/refs/heads/master/out/Stern_Gerlach_zigzag_xz.png)
