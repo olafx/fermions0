@@ -4,13 +4,13 @@ from pathlib import Path
 from util import filter_r_max
 
 # physics params
-orbital = '200'; assert orbital in ('100', '200', '210', '211', '2p_x', '100_210')
+orbital = '100_210'; assert orbital in ('100', '200', '210', '211', '2p_x', '100_210')
 a = 1 # Bohr radius
 om1 = 1/(2*a**2) # frequency associated to n=1 energy
 om12 = 3/4*om1 # frequency associated to n=1 to n=2 transition energy
 alpha = 2 # fine structure constant
 M = 2/alpha # dimensionless mass, or speed of light
-tf = 3e2/om1 # final time
+tf = 5e2/om1 # final time
 c_100_210 = [(1/4)**.5+0j, (3/4)**.5+0j] # real coefficients for the 100-210 hybrid orbital
 sig_100_210 = om1/1e2 # transition rate for the 100-210-sigmoid hybrid orbital
 # numerical params
@@ -18,7 +18,7 @@ n_samples = int(1e4) # number of samples
 n_paths = 2 # number of samples for which to also plot trajectories
 seed = 43 # RNG seed
 # MC params
-xi_max = 10. # maximum distance to sample in units of Bohr radius
+xi_max = 20. # maximum distance to sample in units of Bohr radius
 print_MC_eff = True # print Monte Carlo sampling efficiency
 # integrator params
 abs_tol = 1e-12 # integrator absolute error tolerance (but we undimensionalize)
@@ -26,7 +26,7 @@ p_tol = 1e-3 # integrator transition probability tolerance
 max_iter = int(1e7) # integrator max number of iterations
 print_progress = True # integrator print progress
 # plot params
-plot_3D = False # simple 3D interactive plot instead of 2D plot
+plot_3D = True # simple 3D interactive plot instead of 2D plot
 plot_save = True # save 2D plots instead of showing
 plot_dark = False # plot 2D with dark background, 3D is always dark
 use_tex = True # use LaTeX text rendering
@@ -91,7 +91,7 @@ if plot_3D:
   import vispy.app, vispy.scene
   canvas = vispy.scene.SceneCanvas(f'{orbital} zigzag', keys='interactive', show=True)
   view = canvas.central_widget.add_view()
-  view.camera = 'turntable'
+  view.camera = 'fly'
   for i, path in enumerate(paths):
     vispy.scene.Line(path[:,1:4], color=colors[i % len(colors)], parent=view.scene)
   markers = vispy.scene.Markers()

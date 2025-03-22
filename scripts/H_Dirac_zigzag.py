@@ -8,7 +8,7 @@ om1 = 1/(2*a**2) # frequency associated to nonrelativistic n=1 energy
 # M factor at least 1
 # M = 1/(a*om1) # dimensionless mass, or speed of light
 # alpha = 2/M
-alpha = .5
+alpha = .2
 M = 2/alpha
 tf = 2e2/om1 # final time
 # numerical params
@@ -16,7 +16,7 @@ n_samples = int(1e4) # number of samples
 n_paths = 2 # number of samples for which to also plot trajectories
 seed = 42 # RNG seed
 # MC params
-xi_max = 10. # maximum distance to sample in units of Bohr radius
+xi_max = 20. # maximum distance to sample in units of Bohr radius
 print_MC_eff = True # print Monte Carlo sampling efficiency
 # integrator params
 abs_tol = 1e-12 # integrator absolute error tolerance (but we undimensionalize)
@@ -24,7 +24,7 @@ p_tol = 1e-4 # integrator transition probability tolerance
 max_iter = int(1e7) # integrator max number of iterations
 print_progress = True # integrator print progress
 # plot params
-plot_3D = False # simple 3D interactive plot instead of 2D plot
+plot_3D = True # simple 3D interactive plot instead of 2D plot
 plot_save = False # save 2D plots instead of showing
 plot_dark = False # plot 2D with dark background, 3D is always dark
 use_tex = True # use LaTeX text rendering
@@ -62,7 +62,7 @@ if plot_3D:
   import vispy.app, vispy.scene
   canvas = vispy.scene.SceneCanvas(f'{orbital} zigzag', keys='interactive', show=True)
   view = canvas.central_widget.add_view()
-  view.camera = 'turntable'
+  view.camera = 'fly'
   for i, path in enumerate(paths):
     vispy.scene.Line(path[:,1:4], color=colors[i % len(colors)], parent=view.scene)
   markers = vispy.scene.Markers()

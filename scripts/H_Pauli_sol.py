@@ -8,13 +8,13 @@ from util import C_to_s
 # state = [(1, (2, 1, 1/2, +1/2))]
 # state = [(1, (2, 1, 3/2, +1/2))]
 # state = [(1, (2, 1, 1/2, +1/2)), (1j, (3, 0, 1/2, -1/2)), (-2, (4, 3, 5/2, -1/2))]
-state = [(1, (2, 1, 3/2, +1/2))]
+state = [(1, (2, 1, 1/2, +1/2))]
 # plot params
 plot_3D = False # simple 3D plot instead of 2D plot
 quiver_2D = True
 hr = 20 # half range in Bohr radii
 N = 512 # resolution
-N_quiver = 24 # quiver resolution
+N_quiver = 16 # quiver resolution
 plot_dark = False # plot 2D with dark background, 3D is always dark
 use_tex = True # use LaTeX text rendering
 sqrt_scaling = True # plot the square root of density instead
@@ -22,6 +22,7 @@ plane_init = 'xz'; assert plane_init in ('xz', 'yz', 'xy') # default plane
 slice_init = 0 # default slice
 plot_save = True # save 2D plot instead of showing
 plot_title = False # plot the state in the title
+plot_ticks = False # plot coordinate and colorbar ticks
 
 def psi(n, l, j, m, r, th, phi) -> tuple[float,float]:
   p = j-l == 1/2
@@ -66,7 +67,7 @@ def eval_rho_plane(plane:str, slice_) -> np.ndarray:
 def run_plot_2D():
   import matplotlib.pyplot as plt
   from matplotlib.widgets import Slider, RadioButtons
-  plt.rcParams['font.size'] = 14
+  plt.rcParams['font.size'] = 18
   plt.rcParams['figure.figsize'] = (5, 5)
   if use_tex: plt.rcParams['text.usetex'] = True
   if plot_dark: plt.style.use('dark_background')
@@ -84,11 +85,12 @@ def run_plot_2D():
     if vmax is None: vmax = np.max(data)
     ax.clear()
     ax.set_xlabel(f'${plane[0]}$'); ax.set_ylabel(f'${plane[1]}$')
-    title = f'${(set('xyz')-set(plane)).pop()}={slice:.1f}$'
-    if len(state) == 1 and plot_title:
-      _, (n, l, j, m) = state[0]
-      title = f'$(n,l,j,m)=({n},{l},{j},{m})$\n{title}'
-    ax.set_title(title)
+    if plot_ticks:
+      title = f'${(set('xyz')-set(plane)).pop()}={slice:.1f}$'
+      if len(state) == 1 and plot_title:
+        _, (n, l, j, m) = state[0]
+        title = f'$(n,l,j,m)=({n},{l},{j},{m})$\n{title}'
+      ax.set_title(title)
     img = ax.imshow(data, extent=(-hr, hr, -hr, hr), origin='lower', vmin=0, vmax=vmax, aspect='equal', cmap='cividis',
       interpolation='none')
     if quiver_2D:
@@ -100,11 +102,16 @@ def run_plot_2D():
         case 'xy': s1, s2 = sx, sy
         case 'xz': s1, s2 = sx, sz
         case 'yz': s1, s2 = sy, sz
-      ax.quiver(a, b, s1, s2, angles='xy')
+      ax.quiver(a, b, s1, s2, angles='xy', color='#ffffff')
+    if not plot_ticks:
+      plt.xticks([], [])
+      plt.yticks([], [])
     return img
   data = eval_rho_plane(plane_init, slice_init)
   img = plot(data, plane_init, slice_init)
-  fig.colorbar(img, ax=ax, fraction=.046, pad=.04).set_label(R'$\sqrt{\rho}$' if sqrt_scaling else R'$\rho$')
+  cbar = fig.colorbar(img, ax=ax, fraction=.046, pad=.04)
+  cbar.set_label(R'$\sqrt{\rho}$' if sqrt_scaling else R'$\rho$')
+  if not plot_ticks: cbar.set_ticks([])
   ax.set_box_aspect(1)
   plt.tight_layout()
   if not plot_save:

@@ -4,18 +4,18 @@ from pathlib import Path
 from util import filter_r_max
 
 # physics params
-orbital = '2_1_3o2_p1o2'; assert orbital in ('1_0_1o2_p1o2', '2_0_1o2_p1o2', '2_1_1o2_p1o2', '2_1_3o2_p1o2', '2_1_3o2_p3o2')
+orbital = '2_1_1o2_p1o2'; assert orbital in ('1_0_1o2_p1o2', '2_0_1o2_p1o2', '2_1_1o2_p1o2', '2_1_3o2_p1o2', '2_1_3o2_p3o2')
 a = 1 # Bohr radius
 om1 = 1/(2*a**2) # frequency associated to n=1 energy
-alpha = 2 # fine structure constant
+alpha = .5 # fine structure constant
 M = 2/alpha # dimensionless mass, or speed of light
 tf = 3e2/om1 # final time
 # numerical params
 n_samples = int(1e4) # number of samples
-n_paths = 6 # number of samples for which to also plot trajectories
-seed = 43 # RNG seed
+n_paths = 2 # number of samples for which to also plot trajectories
+seed = 42 # RNG seed
 # MC params
-xi_max = 15. # maximum distance to sample in units of Bohr radius
+xi_max = 9. # maximum distance to sample in units of Bohr radius
 print_MC_eff = True # print Monte Carlo sampling efficiency
 # integrator params
 abs_tol = 1e-12 # integrator absolute error tolerance (but we undimensionalize)
@@ -24,11 +24,12 @@ max_iter = int(1e7) # integrator max number of iterations
 print_progress = True # integrator print progress
 # plot params
 plot_3D = False # simple 3D interactive plot instead of 2D plot
-plot_save = False # save 2D plots instead of showing
+plot_save = True # save 2D plots instead of showing
 plot_dark = False # plot 2D with dark background, 3D is always dark
 use_tex = True # use LaTeX text rendering
 lw = 1 # linewidth
 ms = .5 # markersize
+plot_ticks = False # plot coordinate ticks
 
 H_Pauli = ctypes.CDLL(Path('out')/'H_Pauli.so')
 match orbital:
@@ -80,7 +81,7 @@ if plot_3D:
   import vispy.app, vispy.scene
   canvas = vispy.scene.SceneCanvas(f'{orbital} zigzag', keys='interactive', show=True)
   view = canvas.central_widget.add_view()
-  view.camera = 'turntable'
+  view.camera = 'fly'
   for i, path in enumerate(paths):
     vispy.scene.Line(path[:,1:4], color=colors[i % len(colors)], parent=view.scene)
   markers = vispy.scene.Markers()
@@ -92,7 +93,7 @@ else:
   if plot_save:
     from os import makedirs
     makedirs('out', exist_ok=True)
-  plt.rcParams['font.size'] = 14
+  plt.rcParams['font.size'] = 18
   plt.rcParams['figure.figsize'] = (5, 5)
   if use_tex: plt.rcParams['text.usetex'] = True
   if plot_dark:
@@ -110,6 +111,9 @@ else:
   else:
     plt.xlim(-xi_max, xi_max); plt.ylim(-xi_max, xi_max)
   plt.xlabel('$x$'); plt.ylabel('$y$')
+  if not plot_ticks:
+    plt.xticks([], [])
+    plt.yticks([], [])
   plt.gca().set_box_aspect(1)
   plt.tight_layout()
   if plot_save: plt.savefig(Path('out')/f'Pauli_H_zigzag_{orbital}_xy.pdf', bbox_inches='tight')
@@ -123,6 +127,9 @@ else:
   else:
     plt.xlim(-xi_max, xi_max); plt.ylim(-xi_max, xi_max)
   plt.xlabel('$x$'); plt.ylabel('$z$')
+  if not plot_ticks:
+    plt.xticks([], [])
+    plt.yticks([], [])
   plt.gca().set_box_aspect(1)
   plt.tight_layout()
   if plot_save: plt.savefig(Path('out')/f'Pauli_H_zigzag_{orbital}_xz.pdf', bbox_inches='tight')
@@ -136,6 +143,9 @@ else:
   else:
     plt.xlim(-xi_max, xi_max); plt.ylim(-xi_max, xi_max)
   plt.xlabel('$y$'); plt.ylabel('$z$')
+  if not plot_ticks:
+    plt.xticks([], [])
+    plt.yticks([], [])
   plt.gca().set_box_aspect(1)
   plt.tight_layout()
   if plot_save: plt.savefig(Path('out')/f'Pauli_H_zigzag_{orbital}_yz.pdf', bbox_inches='tight')

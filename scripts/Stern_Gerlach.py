@@ -15,7 +15,7 @@ c = { # associated spinor coefficients
   '+y': [2**-.5+0j, 1j*2**-.5], '-y': [1j*2**-.5, 2**-.5+0j],
   '+z': [1+0j, 0j], '-z': [0j, 1+0j]}[s]
 # numerical params
-n = 20 # number of samples
+n = 12 # number of samples
 seed = 42 # RNG seed
 # integrator params
 abs_tol = 1e-12 # integrator absolute error tolerance
@@ -23,10 +23,11 @@ p_tol = 1e-3 # integrator transition probability tolerance
 max_iter = int(1e7) # integrator max number of iterations
 print_progress = True # integrator print progress
 # plot params
-plot_3D = True # simple 3D interactive plot instead of 2D plot
-plot_save = False # save 2D plots instead of showing
-plot_dark = True # plot 2D with dark background, 3D is always dark
+plot_3D = False # simple 3D interactive plot instead of 2D plot
+plot_save = True # save 2D plots instead of showing
+plot_dark = False # plot 2D with dark background, 3D is always dark
 use_tex = True # use LaTeX text rendering
+plot_ticks = False # plot coordinate ticks
 
 Stern_Gerlach = ctypes.CDLL(Path('out')/'Stern_Gerlach.so')
 match dynamics:
@@ -49,7 +50,7 @@ if plot_3D:
   import vispy.app, vispy.scene
   canvas = vispy.scene.SceneCanvas(dynamics, keys='interactive', show=True)
   view = canvas.central_widget.add_view()
-  view.camera = 'turntable'
+  view.camera = 'fly'
   for i, path in enumerate(paths): vispy.scene.Line(path[:,1:4], color=colors[i % len(colors)], parent=view.scene)
   view.camera.set_range()
   canvas.app.run()
@@ -74,6 +75,9 @@ else:
   plt.gca().add_patch(patches.Ellipse([0]*2, 2*sig[0], 2*sig[1], facecolor=fill, alpha=.5))
   plt.ylim(*ylim)
   plt.xlabel('$x$'); plt.ylabel('$y$')
+  if not plot_ticks:
+    plt.xticks([], [])
+    plt.yticks([], [])
   plt.tight_layout()
   if plot_save: plt.savefig(Path('out')/f'Stern_Gerlach_{dynamics}_xy.pdf', bbox_inches='tight')
 
@@ -84,6 +88,9 @@ else:
   plt.gca().add_patch(patches.Ellipse([0]*2, 2*sig[0], 2*sig[2], facecolor=fill, alpha=.5))
   plt.ylim(*zlim)
   plt.xlabel('$x$'); plt.ylabel('$z$')
+  if not plot_ticks:
+    plt.xticks([], [])
+    plt.yticks([], [])
   plt.tight_layout()
   if plot_save: plt.savefig(Path('out')/f'Stern_Gerlach_{dynamics}_xz.pdf', bbox_inches='tight')
 
@@ -100,6 +107,9 @@ else:
   plt.xlim(0, max(path.shape[0] for path in paths))
   plt.grid(which='both')
   plt.xlabel('iteration'); plt.ylabel(R'$\Delta t$')
+  if not plot_ticks:
+    plt.xticks([], [])
+    plt.yticks([], [])
   plt.tight_layout()
   if plot_save: plt.savefig(Path('out')/f'Stern_Gerlach_{dynamics}_Delta_t.pdf', bbox_inches='tight')
 
@@ -109,6 +119,9 @@ else:
   plt.xlim(0, max(path.shape[0] for path in paths))
   plt.grid(which='both')
   plt.xlabel('iteration'); plt.ylabel('$t$')
+  if not plot_ticks:
+    plt.xticks([], [])
+    plt.yticks([], [])
   plt.tight_layout()
   if plot_save: plt.savefig(Path('out')/f'Stern_Gerlach_{dynamics}_time.pdf', bbox_inches='tight')
 

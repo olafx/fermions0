@@ -17,8 +17,8 @@ abs_tol = 1e-12 # integrator absolute error tolerance (but we undimensionalize)
 max_iter = int(1e6) # integrator max number of iterations
 print_progress = True # integrator print progress
 # plot params
-plot_3D = False # simple 3D interactive plot instead of 2D plot
-plot_save = True # save 2D plots instead of showing
+plot_3D = True # simple 3D interactive plot instead of 2D plot
+plot_save = False # save 2D plots instead of showing
 plot_dark = False # plot 2D with dark background, 3D is always dark
 use_tex = True # use LaTeX text rendering
 n_colors = 100 # number of different colors for time-dependence

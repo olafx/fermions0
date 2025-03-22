@@ -6,8 +6,8 @@ from util import C_to_s
 # physics params
 # superposition of (n,l,j,m) eigenstates, can be unnormalized
 # state = [(1, (2, 1, 1/2, +1/2)), (1j, (3, 0, 1/2, -1/2)), (-2, (4, 3, 5/2, -1/2))]
-state = [(1, (1, 0, 1/2, +1/2))]
-alpha = 0.3 # fine structure constant
+state = [(1, (2, 1, 3/2, +1/2))]
+alpha = 0.2 # fine structure constant
 # plot params
 plot_3D = False # simple 3D plot instead of 2D plot
 quiver_2D = True
@@ -19,8 +19,9 @@ use_tex = True # use LaTeX text rendering
 sqrt_scaling = True # plot the square root of density instead
 plane_init = 'xz'; assert plane_init in ('xz', 'yz', 'xy') # default plane
 slice_init = 0 # default slice
-plot_save = False # save 2D plot instead of showing
+plot_save = True # save 2D plot instead of showing
 plot_title = False # plot the state in the title
+plot_ticks = False # plot coordinate and colorbar ticks
 
 def psi(n, l, j, m, alpha, xi, th, phi) -> tuple[float,float,float,float]:
   p = j-l == 1/2
@@ -97,11 +98,12 @@ def run_plot_2D():
     if vmax is None: vmax = np.max(data)
     ax.clear()
     ax.set_xlabel(f'${plane[0]}/a$'); ax.set_ylabel(f'${plane[1]}/a$')
-    title = f'${(set('xyz')-set(plane)).pop()}/a={slice:.1f}$ $\\alpha={alpha:.2f}$'
-    if len(state) == 1 and plot_title:
-      _, (n, l, j, m) = state[0]
-      title = f'$(n,l,j,m)=({n},{l},{j},{m})$\n{title}'
-    ax.set_title(title)
+    if plot_ticks:
+      title = f'${(set('xyz')-set(plane)).pop()}/a={slice:.1f}$ $\\alpha={alpha:.2f}$'
+      if len(state) == 1 and plot_title:
+        _, (n, l, j, m) = state[0]
+        title = f'$(n,l,j,m)=({n},{l},{j},{m})$\n{title}'
+      ax.set_title(title)
     img = ax.imshow(data, extent=(-hr, hr, -hr, hr), origin='lower', vmin=0, vmax=vmax, aspect='equal',
       cmap='cividis', interpolation='none')
     if quiver_2D:
@@ -114,10 +116,15 @@ def run_plot_2D():
         case 'xz': s1, s2 = sx, sz
         case 'yz': s1, s2 = sy, sz
       ax.quiver(a, b, s1, s2, angles='xy')
+    if not plot_ticks:
+      plt.xticks([], [])
+      plt.yticks([], [])
     return img
   data = eval_rho_plane(plane_init, slice_init, alpha)
   img = plot(data, plane_init, slice_init, alpha)
-  fig.colorbar(img, ax=ax, fraction=.046, pad=.04).set_label(R'$\sqrt{\rho}$' if sqrt_scaling else R'$\rho$')
+  cbar = fig.colorbar(img, ax=ax, fraction=.046, pad=.04)
+  cbar.set_label(R'$\sqrt{\rho}$' if sqrt_scaling else R'$\rho$')
+  if not plot_ticks: cbar.set_ticks([])
   ax.set_box_aspect(1)
   plt.tight_layout()
   if not plot_save:
